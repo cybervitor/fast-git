@@ -1,0 +1,44 @@
+# =========================
+# OS generated files
+# =========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# =========================
+# Editor directories and files
+# =========================
+# Ignore everything in .vscode/ EXCEPT standard config files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains / IntelliJ
+.idea/
+
+# Vim / Nano / Emacs
+*.swp
+*.swo
+*~
+
+# Local history extensions
+.history/
+
+# =========================
+# Shell/Execution files
+# =========================
+# Logs and temp files
+*.log
+/tmp/
+/temp/
+
+# Local installation testing directories 
+# (If you ever test install.sh with PREFIX=./local or PREFIX=./bin)
+/local/
+/bin/
