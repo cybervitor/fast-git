@@ -37,14 +37,14 @@ Highly recommended for tying this CLI workflow directly into your editor environ
 You can install `fast-git` globally for all users, or locally in your home directory.
 
 **For a system-wide installation (requires sudo):**
-\`\`\`bash
+```bash
 sudo ./install.sh
-\`\`\`
+```
 
 **For a local user installation (no sudo required):**
-\`\`\`bash
+```bash
 PREFIX=~/.local ./install.sh
-\`\`\`
+```
 
 > **Note:** If installing locally, ensure `~/.local/bin` is in your system's `$PATH`.
 
