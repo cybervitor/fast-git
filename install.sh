@@ -5,14 +5,14 @@ PREFIX="${PREFIX:-/usr/local}"
 
 CHECK_DIR="$PREFIX" # Find the closest existing parent directory to check write permissions
 while [[ ! -d "$CHECK_DIR" ]]; do
-    CHECK_DIR="$(dirname "$CHECK_DIR")"
+	CHECK_DIR="$(dirname "$CHECK_DIR")"
 done
 
 if [[ ! -w "$CHECK_DIR" ]]; then # Evaluate if the executing user has write access to that directory
-    echo "Error: You do not have write permissions for '$CHECK_DIR'." >&2
-    echo "Please run this script with sudo (e.g., sudo ./install.sh)" >&2
-    echo "or choose a user-owned PREFIX (e.g., PREFIX=~/.local ./install.sh)." >&2
-    exit 1
+	echo "Error: You do not have write permissions for '$CHECK_DIR'." >&2
+	echo "Please run this script with sudo (e.g., sudo ./install.sh)" >&2
+	echo "or choose a user-owned PREFIX (e.g., PREFIX=~/.local ./install.sh)." >&2
+	exit 1
 fi
 
 LIB_DIR="$PREFIX/lib/git-tools"
