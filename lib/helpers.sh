@@ -1,4 +1,6 @@
 #!/bin/bash
+export VERBOSE="${VERBOSE:-false}" # Global verbosity toggle (default: disabled)
+
 
 # Fetches the current GitLab project ID using the glab CLI.
 # Outputs:
@@ -56,6 +58,15 @@ is_gitlab_repo() {
 is_glab_authenticated() {
 	# '|| true' swallows 401 error from glab preventing pipefail
     { glab auth status 2>&1 || true; } | grep -q "Logged in to"
+}
+
+# Prints a message to standard output (STDOUT) if verbose is enabled
+# Returns:
+#   0 unless a write error occurs.
+log() {
+    if [[ "${VERBOSE:-false}" == "true" ]]; then
+        echo "$1"
+    fi
 }
 
 # Prints a standard error message to standard error (STDERR) and exits.

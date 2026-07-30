@@ -16,7 +16,7 @@ ticket() {
 	local project_id # Fetch Project ID
 	project_id=$(get_project_id)
 
-	echo "Asking glab to create a ticket..."
+	log "Asking glab to create a ticket..."
 	local issue_json
 	if ! issue_json=$(glab api "/projects/${project_id}/issues" -X POST \
 		-F "title=${title}" \
@@ -31,7 +31,7 @@ ticket() {
 	if [[ -z "$issue_id" ]]; then # Check if there was any problem with creating the issue
 		fatal_error "Failed to parse issue ID from glab output. Raw output: $issue_json"
 	fi
-	echo "Ticket created: #$issue_id ($issue_url)"
+	log "Ticket created: #$issue_id ($issue_url)"
 
 	local safe_title # Clean up the title string to a safe format
 	safe_title=$(printf '%s' "$title" \
@@ -53,14 +53,14 @@ ticket() {
 		)"
 	fi
 
-	echo "Syncing with origin..."
+	log "Syncing with origin..."
 
 	git fetch origin --quiet || fatal_error "Failed to fetch from origin."
 
 	local default_branch # Dynamically determine if the default branch is main or master
 	default_branch=$(get_default_branch)
 
-	echo "Switching to $branch_name (from origin/$default_branch)..."
+	log "Switching to $branch_name (from origin/$default_branch)..."
 
 	# Branch directly from the latest remote state
 	if ! git checkout -b "$branch_name" "origin/$default_branch"; then
@@ -71,7 +71,7 @@ ticket() {
 		)"
 	fi
 
-	echo "Publishing $branch_name to GitLab..."
+	log "Publishing $branch_name to GitLab..."
 
 	local push_output # Publishing so other devs can see the branch
 	if ! push_output=$(git push --set-upstream origin "$branch_name" 2>&1); then

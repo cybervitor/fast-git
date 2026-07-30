@@ -1,17 +1,31 @@
 #compdef fast
 
 _fast() {
-    local -a commands
-    
-    # Define commands and their descriptions
-    commands=(
-        'ticket:Scaffold a new branch and GitLab issue'
-        'ongoing:Check active team development branches'
-        'backlog:View the team backlog and unassigned issues'
+    local context state line
+    typeset -A opt_args
+
+    local -a options
+    options=(
+        '(-v --verbose)'{-v,--verbose}'[Enable detailed logging]'
+        '(-h --help)'{-h,--help}'[Show help message]'
     )
-    
-    # Tell Zsh to display them as a menu
-    _describe -t commands 'fast commands' commands
+
+    _arguments -s \
+        $options \
+        '1: :->cmd' \
+        '*:: :->args'
+
+    case $state in
+        cmd)
+            local -a commands
+            commands=(
+                'ticket:Scaffold a new branch and GitLab issue'
+                'ongoing:Check active team development branches'
+                'backlog:View the team backlog and unassigned issues'
+            )
+            _describe -t commands 'fast command' commands
+            ;;
+    esac
 }
 
 # Safely register the completion so you can easily 'source' this file

@@ -11,7 +11,7 @@ ongoing() {
 	local project_id # Fetch Project ID
 	project_id=$(get_project_id)
 
-	echo "Scanning remote branches for active tickets..."
+	log "Scanning remote branches for active tickets..."
 	
 	# Extract active Issue IDs from remote branches
 	# - Gets all remote branches
@@ -24,7 +24,7 @@ ongoing() {
 		fatal_error "No active issue branches found on the remote."
 	fi
 
-	echo "Cross-referencing with GitLab open issues..."
+	log "Cross-referencing with GitLab open issues..."
 	
 	local issues_json # Fetch open issues using the GitLab API
 	issues_json=$(get_open_issues "$project_id")

@@ -31,7 +31,7 @@ backlog() {
 	local project_id #Obtains the project ID
 	project_id=$(get_project_id)
 	
-	echo "Fetching team status (Issues and branches)..."
+	log "Fetching team status (Issues and branches)..."
 	
 	local issues_json # Fetch open issues (Full Backlog)
 	issues_json=$(get_open_issues "$project_id")
