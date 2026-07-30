@@ -4,6 +4,8 @@ set -euo pipefail
 PREFIX="${PREFIX:-/usr/local}"
 LIB_DIR="$PREFIX/lib/git-tools"
 BIN_WRAPPER="$PREFIX/bin/fast"
+BASH_COMPLETION_FILE="$PREFIX/share/bash-completion/completions/fast"
+ZSH_COMPLETION_FILE="$PREFIX/share/zsh/site-functions/_fast"
 
 # Find the closest existing parent directory to check write permissions
 CHECK_DIR="$PREFIX"
@@ -33,6 +35,16 @@ if [[ -d "$LIB_DIR" ]]; then
 	echo "Removed $LIB_DIR"
 else
 	echo "Library directory not found: $LIB_DIR"
+fi
+
+if [[ -f "$BASH_COMPLETION_FILE" ]]; then
+	rm "$BASH_COMPLETION_FILE"
+	echo "Removed $BASH_COMPLETION_FILE"
+fi
+
+if [[ -f "$ZSH_COMPLETION_FILE" ]]; then
+	rm "$ZSH_COMPLETION_FILE"
+	echo "Removed $ZSH_COMPLETION_FILE"
 fi
 
 echo "Uninstallation complete."

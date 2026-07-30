@@ -1,0 +1,18 @@
+#compdef fast
+
+_fast() {
+    local -a commands
+    
+    # Define commands and their descriptions
+    commands=(
+        'ticket:Scaffold a new branch and GitLab issue'
+        'ongoing:Check active team development branches'
+        'backlog:View the team backlog and unassigned issues'
+    )
+    
+    # Tell Zsh to display them as a menu
+    _describe -t commands 'fast commands' commands
+}
+
+# Safely register the completion so you can easily 'source' this file
+compdef _fast fast 2>/dev/null

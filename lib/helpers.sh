@@ -41,18 +41,21 @@ get_default_branch() {
     fi
 }
 
-# Checks if the current working directory is inside a Git repository.
+# Checks if the current directory is a Git repository linked to GitLab.
+# Note: Requires glab CLI to be installed and authenticated first!
 # Returns:
-#   0 if inside a git repo, 1 otherwise.
-is_repo() {
-	git rev-parse --is-inside-work-tree >/dev/null 2>&1
+#   0 if inside a valid GitLab repo, 1 otherwise.
+is_gitlab_repo() {
+    git rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 1 # Fast fail
+    glab repo view >/dev/null 2>&1	# ask glab if it recognizes this as a GitLab project
 }
 
-# Checks if the user is currently authenticated with the glab CLI.
+# Checks if the user is authenticated with at least one GitLab instance.
 # Returns:
-#   0 if authenticated, 1 otherwise.
+#   0 if at least one instance is authenticated, 1 otherwise.
 is_glab_authenticated() {
-	glab auth status >/dev/null 2>&1
+	# '|| true' swallows 401 error from glab preventing pipefail
+    { glab auth status 2>&1 || true; } | grep -q "Logged in to"
 }
 
 # Prints a standard error message to standard error (STDERR) and exits.

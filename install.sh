@@ -14,20 +14,26 @@ if [[ ! -w "$CHECK_DIR" ]]; then # Evaluate if the executing user has write acce
 	echo "or choose a user-owned PREFIX (e.g., PREFIX=~/.local ./install.sh)." >&2
 	exit 1
 fi
-
 LIB_DIR="$PREFIX/lib/git-tools"
 BIN_DIR="$PREFIX/bin"
+BASH_COMPLETION_DIR="$PREFIX/share/bash-completion/completions"
+ZSH_COMPLETION_DIR="$PREFIX/share/zsh/site-functions"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "Installing git-tools to $LIB_DIR..."
-install -d "$LIB_DIR/lib" "$LIB_DIR/commands" "$BIN_DIR"
+install -d "$LIB_DIR/lib" "$LIB_DIR/commands" "$BIN_DIR" "$BASH_COMPLETION_DIR" "$ZSH_COMPLETION_DIR"
 install -m644 "$SCRIPT_DIR/lib/helpers.sh" "$LIB_DIR/lib/helpers.sh"
 install -m644 "$SCRIPT_DIR"/commands/*.sh "$LIB_DIR/commands/"
 install -m755 "$SCRIPT_DIR/fast.sh" "$LIB_DIR/fast.sh"
 
+# Install shell completions
+install -m644 "$SCRIPT_DIR/completions/fast.bash" "$BASH_COMPLETION_DIR/fast"
+install -m644 "$SCRIPT_DIR/completions/_fast" "$ZSH_COMPLETION_DIR/_fast"
+
 # Create a symlink in the binary directory pointing to the real script
 ln -sf "$LIB_DIR/fast.sh" "$BIN_DIR/fast"
 
-echo "Installed. Run 'fast <command>' from anywhere."
+echo "Installed successfully with shell completions."
+echo "Run 'fast <command>' from anywhere."
 echo ""
 "$BIN_DIR/fast" || true

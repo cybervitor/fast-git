@@ -21,12 +21,12 @@ _print_issue_group() {
 }
 
 backlog() {
-	is_repo || fatal_error "Not inside a git repository." # Checks if we're inside a git repo
-	
 	{ require glab && require jq; } || return 1 # Checks for dependencies
 
 	# Checks for glab authentication
 	is_glab_authenticated || fatal_error "glab is not authenticated. Check the wiki for instructions."
+
+	is_gitlab_repo || fatal_error "Not inside a git***LAB*** repository." # Checks if we're inside a gitLAB repo
 
 	local project_id #Obtains the project ID
 	project_id=$(get_project_id)
