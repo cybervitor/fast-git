@@ -9,9 +9,9 @@ ticket() {
 
 	is_repo || fatal_error "Not inside a git repository." # Checks if we're inside a git repo
 
-	(require glab && require jq) || fatal_error "Missing dependencies (glab or jq). Check the wiki."
+	{ require glab && require jq; } || fatal_error "Missing dependencies (glab or jq). Check the wiki."
 
-	is_glab_authenticaded || fatal_error "glab is not authenticated. Check the wiki for instructions."
+	is_glab_authenticated || fatal_error "glab is not authenticated. Check the wiki for instructions."
 	
 	local project_id # Fetch Project ID
 	project_id=$(get_project_id)
@@ -46,51 +46,47 @@ ticket() {
 
 	if git show-ref --verify --quiet "refs/heads/$branch_name"; then 
 		fatal_error "$( cat <<-EOF
-						Branch '$branch_name' already exists locally.
-						Issue #$issue_id was created: $issue_url
-						Delete or rename the existing branch, or reuse it manually.
-						EOF
-					)"
+				Branch '$branch_name' already exists locally.
+				Issue #$issue_id was created: $issue_url
+				Delete or rename the existing branch, or reuse it manually.
+			EOF
+		)"
 	fi
-
-
-
 
 	echo "Syncing with origin..."
 
 	git fetch origin --quiet || fatal_error "Failed to fetch from origin."
 
 	local default_branch # Dynamically determine if the default branch is main or master
-	default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
-	
-	if [[ -z "$default_branch" ]]; then
-		if git show-ref --verify --quiet refs/remotes/origin/main; then
-			default_branch="main"
-		else
-			default_branch="master"
-		fi
-	fi
+	default_branch=$(get_default_branch)
 
 	echo "Switching to $branch_name (from origin/$default_branch)..."
 
-	# Natively branch directly from the latest remote state
+	# Branch directly from the latest remote state
 	if ! git checkout -b "$branch_name" "origin/$default_branch"; then
-		fatal_alert "Failed to create branch '$branch_name'. 
-Issue #$issue_id was created but no branch exists: $issue_url"
+		fatal_error "$( cat <<-EOF
+				Failed to create branch '$branch_name'. 
+				Issue #$issue_id was created but no branch exists: $issue_url
+			EOF
+		)"
 	fi
 
 	echo "Publishing $branch_name to GitLab..."
+
 	local push_output # Publishing so other devs can see the branch
 	if ! push_output=$(git push --set-upstream origin "$branch_name" 2>&1); then
-		fatal_alert "Branch '$branch_name' was created locally but FAILED TO PUSH.
-Issue #$issue_id is now orphaned — no branch is visible to the team.
-Issue: $issue_url
+		fatal_error "$( cat <<-EOF
+				Branch '$branch_name' was created locally but FAILED TO PUSH.
+				Issue #$issue_id is now orphaned — no branch is visible to the team.
+				Issue: $issue_url
 
-Push error:
-$push_output
+				Push error:
+				$push_output
 
-To fix, run:
-  git push --set-upstream origin $branch_name"
+				To fix, run:
+					git push --set-upstream origin $branch_name
+			EOF
+		)"
 	fi
 
 	echo "Ready to work on $branch_name. Hora do Martelanço!"

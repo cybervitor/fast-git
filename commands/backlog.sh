@@ -1,12 +1,32 @@
 #!/bin/bash
+# Private helper to filter and print issue groups 
+# Expects $parsed_issues to be available in the current scope
+_print_issue_group() { 
+	local assignee="$1"
+	local issues
+	
+	if [[ "$assignee" == "Unassigned" ]]; then	# The unassigned block uses different indentation and ignores the $2 column
+		echo "🔨 $1"
+		issues=$(awk -F'\t' '$1 == "Unassigned" {print "            ▶ #" $3 " - " $4}' <<< "$parsed_issues")
+	else
+		echo "Team Backlog (Unassigned):"
+		issues=$(awk -F'\t' -v u="$assignee" '$1 == u {print "  " $2 " ▶ #" $3 " - " $4}' <<< "$parsed_issues")
+	fi
+
+	if [[ -n "$issues" ]]; then
+		echo "$issues"
+	else
+		echo "            ▶ Backlog is empty"
+	fi
+}
 
 backlog() {
 	is_repo || fatal_error "Not inside a git repository." # Checks if we're inside a git repo
 	
-	require glab && require jq || return 1 # Checks for dependencies
+	{ require glab && require jq; } || return 1 # Checks for dependencies
 
 	# Checks for glab authentication
-	is_glab_authenticaded || fatal_error "glab is not authenticated. Check the wiki for instructions."
+	is_glab_authenticated || fatal_error "glab is not authenticated. Check the wiki for instructions."
 
 	local project_id #Obtains the project ID
 	project_id=$(get_project_id)
@@ -18,20 +38,20 @@ backlog() {
 	
 	local active_ids_json # Fetch active remote branches (Mark Ongoing state)
 	active_ids_json=$(git ls-remote --heads origin | sed -nE 's|.*refs/heads/([0-9]+).*|\1|p' | jq -Rn '[inputs] | unique')
-	# Default to an empty JSON array if no remote branches exist to prevent jq errors
-	[[ -z "$active_ids_json" || "$active_ids_json" == "[]" ]] && active_ids_json="[]"
+	[[ -z "$active_ids_json" || "$active_ids_json" == "[]" ]] && active_ids_json="[]" # empty array if no remote branches exist
 
-	echo ""
-	echo "############################################################"
-	echo "###                  TEAM BACKLOG STATUS                 ###"
-	echo "############################################################"
-	echo ""
+	cat <<-EOF
+
+		############################################################
+		###                  TEAM BACKLOG STATUS                 ###
+		############################################################
+
+	EOF
 
 	local members # Extract the sorted list of project members
 	members=$(jq -r '.[] | .assignees[].username' <<< "$issues_json" | sort -u)
 
-	local parsed_issues 
-	# Extract all issues into a flat TSV format: Assignee <tab> Status <tab> IID <tab> Title
+	local parsed_issues # Extract all issues into a flat TSV format: Assignee <tab> Status <tab> IID <tab> Title
 	# Make sure to check if the IID exists in the active branches map and format the tag
 	# Unroll assignees (so shared tickets create multiple rows) or mark as Unassigned
 	parsed_issues=$(jq -r --argjson active "$active_ids_json" '
@@ -44,34 +64,14 @@ backlog() {
 		| "\($assignee)\t\($status)\t\($iid)\t\($title)"
 	' <<< "$issues_json" | sort -t$'\t' -k1,1 -k2,2r -k3,3n)
 
-	# Iterate through every member in the project
-	local user_issues
-	for user in $members; do
-		echo "🔨 $user:"
-		
-		# awk to exact-match the Assignee column and format output
-		user_issues=$(awk -F'\t' -v u="$user" '$1 == u {print "  " $2 " ▶ #" $3 " - " $4}' <<< "$parsed_issues")
-		
-		if [[ -n "$user_issues" ]]; then
-			echo "$user_issues"
-		else
-			echo "            ▶ Clear backlog!"
-		fi
-		echo "" # Print a blank between users
+	for user in $members; do # Iterate through every member in the project
+		_print_issue_group "$user"
+		echo "" # Empty line between repository members
 	done
+	_print_issue_group "Unassigned"
 
-	echo "️Team Backlog (Unassigned):" # Append Backlog (Unassigned tickets)
+	cat <<-EOF
 
-	# awk to extract rows wher Assignee column is "Unassigned"
-	local unassigned_issues
-	unassigned_issues=$(awk -F'\t' '$1 == "Unassigned" {print "            ▶ #" $3 " - " $4}' <<< "$parsed_issues")
-	
-	if [[ -n "$unassigned_issues" ]]; then
-		echo "$unassigned_issues"
-	else
-		echo "            ▶ Backlog is empty!"
-	fi
-
-	echo ""
-	echo "############################################################"
+		############################################################
+	EOF
 }

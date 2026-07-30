@@ -3,10 +3,10 @@
 ongoing() {
 	is_repo || fatal_error "Not inside a git repository." # Checks if we're inside a git repo
 	
-	require glab && require jq || return 1 # Checks for dependencies
+	{ require glab && require jq; } || return 1 # Checks for dependencies
 
 	# Checks for glab authentication
-	is_glab_authenticaded || fatal_error "glab is not authenticated. Check the wiki for instructions."
+	is_glab_authenticated || fatal_error "glab is not authenticated. Check the wiki for instructions."
 
 	local project_id # Fetch Project ID
 	project_id=$(get_project_id)
@@ -29,11 +29,13 @@ ongoing() {
 	local issues_json # Fetch open issues using the GitLab API
 	issues_json=$(get_open_issues "$project_id")
 	
-	echo ""
-	echo "############################################################"
-	echo "###                  ACTIVE ONGOING TICKETS              ###"
-	echo "############################################################"
-	echo ""
+	cat <<-EOF
+
+		############################################################
+		###                  ACTIVE ONGOING TICKETS              ###
+		############################################################
+
+	EOF
 
 	# Use jq strictly to extract flat, Tab-Separated Values (TSV)
 	# Format: Assignee <tab> IID <tab> Title
@@ -45,7 +47,6 @@ ongoing() {
 		| .[]?
 		| .iid as $iid
 		| .title as $title
-		# If there are multiple assignees, this naturally unrolls into multiple rows!
 		| (if (.assignees | length) > 0 then .assignees[].username else "Unassigned" end) as $assignee
 		| "\($assignee)\t\($iid)\t\($title)"
 	' <<< "$issues_json")
@@ -57,6 +58,7 @@ ongoing() {
 		local sorted_issues # Sort alphabetically by Assignee so they group together naturally
 		sorted_issues=$(echo "$parsed_issues" | sort)
 		local current_assignee=""
+		
 		# Loop through the TSV data
 		while IFS=$'\t' read -r assignee iid title; do          # IFS=$'\t' ensures that spaces inside ticket titles don't break our variables
 			if [[ "$assignee" != "$current_assignee" ]]; then   # When the assignee changes, print the header
