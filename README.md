@@ -1,10 +1,14 @@
 # Fast-GIT
 
-A suite of fast, custom bash utilities designed to seamlessly bridge your local Git workflow with GitLab issue tracking. 
+This tool is designed for development teams self-hosting GitLab who want advanced agile tracking without paying for GitLab Premium or Ultimate. 
 
-Built for speed and trunk-based development, these tools eliminate the friction of creating tickets, syncing branches, and checking team status without ever leaving the terminal.
+Standard GitLab Free only offers "open" or "closed" issue states, which makes tracking in-progress work difficult. `fast-git` fixes this by using your Git repository as the source of truth:
+* **Ongoing Work ("In Progress"):** Represented strictly by open remote branches with a ticket.
+* **Dev Backburner ("To Do"):** Tickets assigned to a specific developer, but without an active branch.
+* **Team Backlog ("Unassigned"):** Unassigned tickets that the team still needs to tackle.
 
----
+Built for speed and trunk-based development, these tools eliminate the friction of leaving the terminal to create tickets, syncing branches, and checking team status. That's the maneger's job, not the dev's job.
+
 
 ## Prerequisites & Setup
 
@@ -25,11 +29,9 @@ Highly recommended for tying this CLI workflow directly into your editor environ
 * **Install:** [GitLab Workflow Extension](https://marketplace.visualstudio.com/items?itemName=GitLab.gitlab-workflow)
 * **Setup:** Requires a Personal Access Token with `api` scope.
 
----
-
 ## Installation
 
-You can install `fast-git` globally for all users, or locally in your home directory.
+You can install `fast-git` globally for all users, or locally in your home directory. The installer will automatically configure Bash and Zsh tab completions.
 
 **For a system-wide installation (requires sudo):**
 ```bash
@@ -43,20 +45,35 @@ PREFIX=~/.local ./install.sh
 
 > **Note:** If installing locally, ensure `~/.local/bin` is in your system's `$PATH`.
 
----
+
+## Global Options
+
+The `fast` dispatcher supports global options that can be placed before the command:
+
+* `-v, --verbose`: Enable detailed logging to see step-by-step execution.
+
+
+* `-h, --help`: Show the help message and list of available commands.
+
+
+*Example:* `fast -v ticket "Fix bug"`
 
 ## Commands
 
-All utilities are accessed via the `fast` command dispatcher.
-
 ### `fast ticket "Title" "Optional Description"`
-A tool for quickly scaffolding new work. It interacts with GitLab to create a new ticket, grabs the newly generated Issue ID, and safely creates a new branch directly from the latest remote trunk. Finally, it publishes the branch upstream so the rest of the team can see it immediately..
+
+A tool for quickly scaffolding new work. It interacts with GitLab to create a new ticket, grabs the newly generated Issue ID, and safely creates a new branch directly from the latest remote trunk. Finally, it publishes the branch upstream so the rest of the team can see it immediately.
+
 * **Usage:** `fast ticket "Fix database index" "Addresses the slow query issue on the user table"`
 
 ### `fast ongoing`
+
 A pulse-check on active development. This command scans the repository's remote branches, extracts any ticket IDs, and cross-references them against GitLab's open issues. It outputs a clean, terminal-friendly dashboard grouped by developer, showing you exactly what work is *currently* happening.
+
 * **Usage:** `fast ongoing`
 
 ### `fast backlog`
+
 The complete team view. It pulls down all open issues for the project and maps them to their assigned developers, clearly tagging which tickets are currently `[ONGOING]` based on active branches. It also outputs the unassigned "Team Backlog" so developers know exactly what to pull from next.
+
 * **Usage:** `fast backlog`
