@@ -6,10 +6,10 @@ _print_issue_group() {
 	local issues
 	
 	if [[ "$assignee" == "Unassigned" ]]; then	# The unassigned block uses different indentation and ignores the $2 column
-		echo "🔨 $1"
+		echo "Team Backlog (Unassigned):"
 		issues=$(awk -F'\t' '$1 == "Unassigned" {print "            ▶ #" $3 " - " $4}' <<< "$parsed_issues")
 	else
-		echo "Team Backlog (Unassigned):"
+		echo "🔨 $1"
 		issues=$(awk -F'\t' -v u="$assignee" '$1 == u {print "  " $2 " ▶ #" $3 " - " $4}' <<< "$parsed_issues")
 	fi
 
