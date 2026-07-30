@@ -16,16 +16,11 @@ Used for querying the GitLab API and generating tickets.
 * **Setup:** You will need a Personal Access Token with `api` and `write_repository` scopes.
 * **Authenticate:** Run `glab auth login` to configure your connection.
 
-### 2. Git Town
-Used by the `ticket` command to safely sync your local `master`/`main` branch and cut a clean working branch.
-* **Install:** [Git Town Installation](https://www.git-town.com/install.html)
-* **Setup:** Run `git-town init` in your repository at least once to configure your branch structure.
-
-### 3. jq
+### 2. jq
 A lightweight and flexible command-line JSON processor used internally to parse API responses.
 * **Install:** Available via most package managers (e.g., `apt install jq`, `brew install jq`).
 
-### 4. GitLab VS Code Extension (Recommended)
+### 3. GitLab VS Code Extension (Recommended)
 Highly recommended for tying this CLI workflow directly into your editor environment.
 * **Install:** [GitLab Workflow Extension](https://marketplace.visualstudio.com/items?itemName=GitLab.gitlab-workflow)
 * **Setup:** Requires a Personal Access Token with `api` scope.
@@ -52,14 +47,14 @@ PREFIX=~/.local ./install.sh
 
 ## Commands
 
-All utilities are accessed via the `fast` command dispatcher[cite: 1].
+All utilities are accessed via the `fast` command dispatcher.
 
 ### `fast ticket "Title" "Optional Description"`
-A tool for quickly scaffolding new work. It interacts with GitLab to create a new ticket[cite: 4], grabs the newly generated Issue ID, and runs `git-town hack` to safely branch off your main trunk[cite: 4]. Finally, it publishes the branch upstream so the rest of the team can see it immediately[cite: 4].
+A tool for quickly scaffolding new work. It interacts with GitLab to create a new ticket, grabs the newly generated Issue ID, and safely creates a new branch directly from the latest remote trunk. Finally, it publishes the branch upstream so the rest of the team can see it immediately..
 * **Usage:** `fast ticket "Fix database index" "Addresses the slow query issue on the user table"`
 
 ### `fast ongoing`
-A pulse-check on active development. This command scans the repository's remote branches, extracts any ticket IDs[cite: 3], and cross-references them against GitLab's open issues[cite: 3]. It outputs a clean, terminal-friendly dashboard grouped by developer, showing you exactly what work is *currently* happening[cite: 3].
+A pulse-check on active development. This command scans the repository's remote branches, extracts any ticket IDs, and cross-references them against GitLab's open issues. It outputs a clean, terminal-friendly dashboard grouped by developer, showing you exactly what work is *currently* happening.
 * **Usage:** `fast ongoing`
 
 ### `fast backlog`

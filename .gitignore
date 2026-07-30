@@ -14,10 +14,10 @@ Thumbs.db
 # =========================
 # Ignore everything in .vscode/ EXCEPT standard config files
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
+.vscode/settings.json
+.vscode/tasks.json
 !.vscode/launch.json
-!.vscode/extensions.json
+.vscode/extensions.json
 
 # JetBrains / IntelliJ
 .idea/

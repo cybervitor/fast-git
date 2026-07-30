@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ongoing() {
     is_repo || fatal_error "Not inside a git repository." # Checks if we're inside a git repo
     
